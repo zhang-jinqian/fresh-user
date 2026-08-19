@@ -17,7 +17,7 @@ const routes = [
   { path: '/register', component: Register },
   { path: '/home', component: Home },   // 确保 Home 组件已导入
   { path: '/', redirect: '/home' },
-  { path: '/fresh-user/list', component: List },
+  { path: '/list', component: List },
   { path: '/goods/detail', component: GoodsDetail },
   { path: '/cart', component: Cart },
    { path: '/checkout', component: Checkout },
