@@ -103,7 +103,7 @@ const navList = ref([
   {
     id: 2,
     name: '生鲜列表',
-    path: '/fresh-user/list',
+    path: '/fresh-user/list11111',
     isActive: false,
     showDropdown: false,
     children: []
