@@ -255,9 +255,9 @@ const hideDropdown = (id) => {
 
 // ---------------- 轮播图相关数据和方法 ----------------
 const carouselList = ref([
-  { title: '轮播图1', imageUrl: '../b1.jpg' },
-  { title: '轮播图2', imageUrl: '../b2.jpg' },
-  { title: '轮播图3', imageUrl: '../b3.jpg' }
+    { title: '轮播图1', imageUrl: import.meta.env.BASE_URL + 'b1.jpg' },
+    { title: '轮播图2', imageUrl: import.meta.env.BASE_URL + 'b2.jpg' },
+    { title: '轮播图3', imageUrl: import.meta.env.BASE_URL + 'b3.jpg' }
 ])
 const currentIndex = ref(0)
 let carouselTimer = null
