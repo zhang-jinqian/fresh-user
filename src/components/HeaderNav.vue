@@ -95,7 +95,7 @@ const navList = ref([
   {
     id: 1,
     name: '首页',
-    path: '/',
+    path: import.meta.env.BASE_URL +'/',
     isActive: false,
     showDropdown: false,
     children: []
@@ -103,7 +103,7 @@ const navList = ref([
   {
     id: 2,
     name: '生鲜列表',
-    path: '/list',
+    path: import.meta.env.BASE_URL +'/list',
     isActive: false,
     showDropdown: false,
     children: []
@@ -111,7 +111,7 @@ const navList = ref([
   {
     id: 3,
     name: '购物车',
-    path: '/cart',
+    path: import.meta.env.BASE_URL +'/cart',
     isActive: false,
     showDropdown: false,
     children: []
