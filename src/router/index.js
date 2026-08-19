@@ -32,7 +32,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(), // 使用 history 模式，需要服务器支持
+  history: createWebHashHistory('/fresh-user/'), // 使用 history 模式，需要服务器支持
   routes
 })
 router.beforeEach((to, from, next) => {
