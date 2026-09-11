@@ -6,7 +6,7 @@
       <nav class="fresh-nav">
         <div class="nav-wrapper">
           <div class="nav-logo">
-            <img :src="BASE + 'logo.png'" alt="生鲜购" class="logo-img">
+            <img :src="../asset/logo.png" alt="生鲜购" class="logo-img">
             <span class="logo-text">生鲜购</span>
           </div>
 
