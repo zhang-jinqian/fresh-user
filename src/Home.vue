@@ -289,8 +289,8 @@ const categoryList =[{ id: 1, name: '新鲜蔬菜', image: '1.jpg' },
   { id: 2, name: '时令水果', image: '2.jpg' },
   { id: 3, name: '肉禽蛋品', image: '3.jpg' },
   { id: 4, name: '海鲜水产', image: '4.jpg' },
-  { id: 5, name: '米面粮油', image: '5.jpg' },
-  { id: 6, name: '乳品烘焙', image: '6.jpg' }]
+  { id: 5, name: '乳品烘焙', image: '5.jpg' },
+  { id: 6, name: '速食冻品', image: '6.jpg' }]
 // 点击分类跳转至对应商品列表
 const goToCategoryList = (categoryId) => {
   // 实际项目中跳转至商品列表页并携带分类ID
