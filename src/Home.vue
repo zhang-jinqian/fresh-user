@@ -421,7 +421,7 @@ const setCountdown = (endTimeStr) => {
 const initSeckillCountdown = () => {
   // 方式一：固定到当天 23:59:59
   const endTime = new Date()
-  endTime.setHours(23, 59, 59, 999)
+  endTime.setHours(23, 29, 59, 999)
 
   // 方式二：想写死具体日期就改成这样
   // const endTime = new Date('2026-12-31 23:59:59')
