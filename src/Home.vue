@@ -232,7 +232,7 @@ const initLoginState = () => {
     userName.value = name
   }
 }
-axios.defaults.baseURL = 'http://localhost/cai/'
+
 
 // ---------------- 导航相关数据和方法 ----------------
 const navList = ref([
@@ -297,17 +297,26 @@ const goToCategoryList = (categoryId) => {
   window.location.href = `/list?category_id=${categoryId}`
 }
 // 获取品类数据
-const getCategoryList = async () => {
-  try {
-    loading.value.category = true
-    const res = [{ id: 1, name: '新鲜蔬菜', image: '1.jpg' },
+import { ref } from 'vue'
+
+// 初始为空数组，由 getCategoryList 填充
+const categoryList = ref([])
+
+// 静态分类数据
+const mockCategoryList = [
+  { id: 1, name: '新鲜蔬菜', image: '1.jpg' },
   { id: 2, name: '时令水果', image: '2.jpg' },
   { id: 3, name: '肉禽蛋品', image: '3.jpg' },
   { id: 4, name: '海鲜水产', image: '4.jpg' },
   { id: 5, name: '米面粮油', image: '5.jpg' },
-  { id: 6, name: '乳品烘焙', image: '6.jpg' }]
-    // 修复：取res.data.data，拿到真正的数组
-    categoryList.value = res.data.data.filter(item => item.category_id > 0)
+  { id: 6, name: '乳品烘焙', image: '6.jpg' }
+]
+
+const getCategoryList = async () => {
+  try {
+    loading.value.category = true
+ await new Promise(r => setTimeout(r, 200))
+    categoryList.value = mockCategoryList
   } catch (error) {
     console.error('获取品类数据失败：', error)
     categoryList.value = []
