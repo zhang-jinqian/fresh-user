@@ -317,66 +317,69 @@ const goToCategoryList = (categoryId) => {
 }
 // ---------------- 限时秒杀（对接营销活动表） ----------------
 const seckillList = ref([
+ import { ref } from 'vue'
+
+// 图片基础路径（和上面品类、轮播一致）
+const BASE = import.meta.env.BASE_URL
+
+// ---------------- 秒杀商品静态数据（随机选5个） ----------------
+const seckillList = ref([
   {
-    id: 101,
-    name: '有机小番茄 500g',
-    img: 'goods1.jpg',
-    price: 19.9,           // 原价
-    discount_value: 9.9,   // 促销价（秒杀价）
-    stock: 50,
+    id: 3,
+    name: '西红柿',
+    img: import.meta.env.BASE_URL + 'goods3.jpg',
+    price: 6.00,
+    discount_value: 3.90,
+    original_price: 6.00,
+    stock: 46,
     count: 0,
     soldOut: false
   },
   {
-    id: 102,
-    name: '海南贵妃芒 2.5kg',
-    img: 'goods2.jpg',
-    price: 59.9,
-    discount_value: 29.9,
+    id: 7,
+    name: '烟台红富士苹果',
+    img:import.meta.env.BASE_URL + 'goods2.jpg',
+    price: 8.50,
+    discount_value: 5.90,
+    original_price: 8.50,
     stock: 30,
     count: 0,
     soldOut: false
   },
   {
-    id: 103,
-    name: '现摘奶油草莓 1kg',
-    img: 'goods3.jpg',
-    price: 79.9,
-    discount_value: 39.9,
-    stock: 20,
+    id: 13,
+    name: '鲜活基围虾',
+    img: import.meta.env.BASE_URL +'goods3.jpg',
+    price: 35.00,
+    discount_value: 25.90,
+    original_price: 35.00,
+    stock: 34,
     count: 0,
     soldOut: false
   },
   {
-    id: 104,
-    name: '农家散养土鸡蛋 30枚',
-    img: 'goods4.jpg',
-    price: 39.9,
-    discount_value: 19.9,
-    stock: 80,
+    id: 17,
+    name: '纯牛奶（全脂）',
+    img:import.meta.env.BASE_URL ++ 'goods4.jpg',
+    price: 5.00,
+    discount_value: 3.50,
+    original_price: 5.00,
+    stock: 37,
     count: 0,
     soldOut: false
   },
   {
-    id: 105,
-    name: '鲜活基围虾 500g',
-    img: 'goods5.jpg',
-    price: 89.9,
-    discount_value: 49.9,
-    stock: 15,
-    count: 0,
-    soldOut: false
-  },
-  {
-    id: 106,
-    name: '新疆冰糖心苹果 5kg',
-    img: 'goods6.jpg',
-    price: 69.9,
-    discount_value: 35.9,
-    stock: 60,
+    id: 21,
+    name: '灌汤小笼包',
+    img: import.meta.env.BASE_URL + 'goods5.jpg',
+    price: 19.00,
+    discount_value: 12.90,
+    original_price: 19.00,
+    stock: 30,
     count: 0,
     soldOut: false
   }
+])
 ])
 
 // ---------------- 倒计时相关 ----------------
