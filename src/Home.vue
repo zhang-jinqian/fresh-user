@@ -376,7 +376,7 @@ const seckillList = ref([
     soldOut: false
   }
 ])
-])
+
 
 // ---------------- 倒计时相关 ----------------
 const hour = ref('00')
