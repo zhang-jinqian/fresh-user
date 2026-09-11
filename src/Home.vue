@@ -185,7 +185,7 @@ const BASE = import.meta.env.BASE_URL
 
 // 图片加载失败时的兜底图（public/默认图.jpg，可自行修改）
 const onImgError = (e) => {
-  e.target.src = BASE + 'default.jpg'
+  e.target.src = BASE + 'default.png'
 }
 
 // ---------------- 登录状态管理 ----------------
