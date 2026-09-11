@@ -308,8 +308,8 @@ const mockCategoryList = [
   { id: 2, name: '时令水果', image: '2.jpg' },
   { id: 3, name: '肉禽蛋品', image: '3.jpg' },
   { id: 4, name: '海鲜水产', image: '4.jpg' },
-  { id: 5, name: '米面粮油', image: '5.jpg' },
-  { id: 6, name: '乳品烘焙', image: '6.jpg' }
+  { id: 5, name: '乳品烘焙', image: '5.jpg' },
+  { id: 6, name: '速食冻品', image: '6.jpg' }
 ]
 
 const getCategoryList = async () => {
