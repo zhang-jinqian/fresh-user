@@ -238,9 +238,9 @@ axios.defaults.baseURL = 'http://localhost/cai/'
 const navList = ref([
   { id: 1, name: '首页', path: '/', isActive: true, showDropdown: false, children: [] },
   { id: 2, name: '生鲜列表', path: '/fresh-user/#/list', isActive: false, showDropdown: false, children: [] },
-  { id: 3, name: '购物车', path: '/cart', isActive: false, showDropdown: false, children: [] },
-  { id: 4, name: '我的订单', path: '/order-list', isActive: false, showDropdown: false, children: [] },
-  { id:5, name:'优惠券', path:'/coupon', isActive:false, showDropdown:false, children:[] }
+  { id: 3, name: '购物车', path: '/fresh-user/#/cart', isActive: false, showDropdown: false, children: [] },
+  { id: 4, name: '我的订单', path: 'fresh-user/#//order-list', isActive: false, showDropdown: false, children: [] },
+  { id:5, name:'优惠券', path:'fresh-user/#/coupon', isActive:false, showDropdown:false, children:[] }
 ])
 
 const showDropdown = (id) => {
