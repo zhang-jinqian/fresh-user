@@ -320,14 +320,13 @@ const seckillList = ref([
  import { ref } from 'vue'
 
 // 图片基础路径（和上面品类、轮播一致）
-const BASE = import.meta.env.BASE_URL
 
 // ---------------- 秒杀商品静态数据（随机选5个） ----------------
 const seckillList = ref([
   {
     id: 3,
     name: '西红柿',
-    img: import.meta.env.BASE_URL + 'goods3.jpg',
+    img: import.meta.env.BASE_URL + 'good1.jpg',
     price: 6.00,
     discount_value: 3.90,
     original_price: 6.00,
@@ -338,7 +337,7 @@ const seckillList = ref([
   {
     id: 7,
     name: '烟台红富士苹果',
-    img:import.meta.env.BASE_URL + 'goods2.jpg',
+    img:import.meta.env.BASE_URL + 'good1.jpg',
     price: 8.50,
     discount_value: 5.90,
     original_price: 8.50,
@@ -349,7 +348,7 @@ const seckillList = ref([
   {
     id: 13,
     name: '鲜活基围虾',
-    img: import.meta.env.BASE_URL +'goods3.jpg',
+    img: import.meta.env.BASE_URL +'good1.jpg',
     price: 35.00,
     discount_value: 25.90,
     original_price: 35.00,
@@ -360,7 +359,7 @@ const seckillList = ref([
   {
     id: 17,
     name: '纯牛奶（全脂）',
-    img:import.meta.env.BASE_URL ++ 'goods4.jpg',
+    img:import.meta.env.BASE_URL + 'good1.jpg',
     price: 5.00,
     discount_value: 3.50,
     original_price: 5.00,
@@ -371,7 +370,7 @@ const seckillList = ref([
   {
     id: 21,
     name: '灌汤小笼包',
-    img: import.meta.env.BASE_URL + 'goods5.jpg',
+    img: import.meta.env.BASE_URL + 'good1.jpg',
     price: 19.00,
     discount_value: 12.90,
     original_price: 19.00,
