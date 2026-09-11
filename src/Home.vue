@@ -6,7 +6,7 @@
       <nav class="fresh-nav">
         <div class="nav-wrapper">
           <div class="nav-logo">
-            <img :src="../asset/logo.png" alt="生鲜购" class="logo-img">
+            <img :src="./assets/logo.png" alt="生鲜购" class="logo-img">
             <span class="logo-text">生鲜购</span>
           </div>
 
@@ -266,10 +266,8 @@ const categoryList = ref([
   { id: 2, name: '时令水果', image: BASE + '2.jpg' },
   { id: 3, name: '肉禽蛋品', image: BASE + '3.jpg' },
   { id: 4, name: '海鲜水产', image: BASE + '4.jpg' },
-  { id: 5, name: '米面粮油', image: BASE + '5.jpg' },
-  { id: 6, name: '乳品烘焙', image: BASE + '6.jpg' },
-  { id: 7, name: '冷冻速食', image: BASE + '7.jpg' },
-  { id: 8, name: '休闲零食', image: BASE + '8.jpg' }
+  { id: 5, name: '乳品烘焙', image: BASE + '5.jpg' },
+  { id: 6, name: '冷冻速食', image: BASE + '6.jpg' }
 ])
 
 const goToCategoryList = (categoryId) => {
