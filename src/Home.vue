@@ -316,9 +316,6 @@ const goToCategoryList = (categoryId) => {
   window.location.href = `/list?category_id=${categoryId}`
 }
 // ---------------- 限时秒杀（对接营销活动表） ----------------
-const seckillList = ref([
- import { ref } from 'vue'
-
 // 图片基础路径（和上面品类、轮播一致）
 
 // ---------------- 秒杀商品静态数据（随机选5个） ----------------
