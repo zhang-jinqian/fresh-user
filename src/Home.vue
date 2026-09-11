@@ -295,7 +295,12 @@ const goToCategoryList = (categoryId) => {
 const getCategoryList = async () => {
   try {
     loading.value.category = true
-    const res = await axios.get('/api/category.php')
+    const res = [{ id: 1, name: '新鲜蔬菜', image: '1.jpg' },
+  { id: 2, name: '时令水果', image: '2.jpg' },
+  { id: 3, name: '肉禽蛋品', image: '3.jpg' },
+  { id: 4, name: '海鲜水产', image: '4.jpg' },
+  { id: 5, name: '米面粮油', image: '5.jpg' },
+  { id: 6, name: '乳品烘焙', image: '6.jpg' }]
     // 修复：取res.data.data，拿到真正的数组
     categoryList.value = res.data.data.filter(item => item.category_id > 0)
   } catch (error) {
