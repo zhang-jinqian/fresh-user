@@ -316,117 +316,129 @@ const goToCategoryList = (categoryId) => {
   window.location.href = `/list?category_id=${categoryId}`
 }
 // ---------------- 限时秒杀（对接营销活动表） ----------------
-const seckillList = ref([])
+const seckillList = ref([
+  {
+    id: 101,
+    name: '有机小番茄 500g',
+    img: 'goods1.jpg',
+    price: 19.9,           // 原价
+    discount_value: 9.9,   // 促销价（秒杀价）
+    stock: 50,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 102,
+    name: '海南贵妃芒 2.5kg',
+    img: 'goods2.jpg',
+    price: 59.9,
+    discount_value: 29.9,
+    stock: 30,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 103,
+    name: '现摘奶油草莓 1kg',
+    img: 'goods3.jpg',
+    price: 79.9,
+    discount_value: 39.9,
+    stock: 20,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 104,
+    name: '农家散养土鸡蛋 30枚',
+    img: 'goods4.jpg',
+    price: 39.9,
+    discount_value: 19.9,
+    stock: 80,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 105,
+    name: '鲜活基围虾 500g',
+    img: 'goods5.jpg',
+    price: 89.9,
+    discount_value: 49.9,
+    stock: 15,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 106,
+    name: '新疆冰糖心苹果 5kg',
+    img: 'goods6.jpg',
+    price: 69.9,
+    discount_value: 35.9,
+    stock: 60,
+    count: 0,
+    soldOut: false
+  }
+])
+
+// ---------------- 倒计时相关 ----------------
 const hour = ref('00')
 const minute = ref('00')
 const second = ref('00')
 let countdownTimer = null
 
-// 获取秒杀商品数据（从营销活动接口获取商品促销类型的有效活动）
-const getSeckillList = async () => {
-  try {
-    loading.value.seckill = true
-    // 调用营销活动接口，筛选商品促销类型且当前时间有效的活动
-    const res = await axios.get('/api/admin_marketing.php')
-    
-    if (res.data.code === 200) {
-      const now = new Date()
-      // 筛选条件：1. 类型为商品促销(1) 2. 活动在有效期内 3. 关联商品ID有效
-      const validMarketing = res.data.data.filter(item => {
-        return item.type === 1 && 
-               item.target_id > 0 &&
-               new Date(item.start_time) <= now && 
-               new Date(item.end_time) >= now
-      })
-
-      // 如果有有效促销活动，逐个获取商品详情
-      if (validMarketing.length > 0) {
-        const productList = []
-        // 循环查询每个商品详情
-        for (const marketing of validMarketing) {
-          try {
-            const productRes = await axios.get(`/api/goods_detail.php?id=${marketing.target_id}`)
-            if (productRes.data.code === 200) {
-              // 兼容接口返回单对象或数组的情况
-              const product = Array.isArray(productRes.data.data) 
-                ? productRes.data.data[0] 
-                : productRes.data.data
-              
-              if (product) {
-                productList.push({
-                  ...product,
-                  discount_value: marketing.discount_value, // 促销价格
-                  start_time: marketing.start_time,
-                  end_time: marketing.end_time
-                })
-              }
-            }
-          } catch (err) {
-            console.error(`获取商品ID ${marketing.target_id} 失败：`, err)
-          }
-        }
-        
-        seckillList.value = productList
-        
-        // 设置倒计时（取第一个活动的结束时间）
-        if (seckillList.value.length > 0) {
-          setCountdown(seckillList.value[0].end_time)
-        }
-      } else {
-        seckillList.value = []
-      }
-    }
-  } catch (error) {
-    console.error('获取秒杀商品失败：', error)
-    seckillList.value = []
-  } finally {
-    loading.value.seckill = false
-  }
-}
-
-// 设置秒杀倒计时（根据活动结束时间计算）
+// 静态化后，不用再调用 getSeckillList，改为直接启动倒计时
+// 倒计时结束时间：写死一个固定值，或使用"当日 23:59:59"
 const setCountdown = (endTimeStr) => {
-  // 清除原有倒计时
-  if (countdownTimer) {
-    clearInterval(countdownTimer)
-  }
-  
-  // 计算剩余时间
+  if (countdownTimer) clearInterval(countdownTimer)
+
   const updateCountdown = () => {
     const now = new Date()
     const endTime = new Date(endTimeStr)
     const remaining = endTime - now
-    
+
     if (remaining <= 0) {
-      // 倒计时结束
       hour.value = '00'
       minute.value = '00'
       second.value = '00'
       clearInterval(countdownTimer)
-      // 重新加载秒杀商品
-      getSeckillList()
+      // 静态数据下，不需要重新请求，直接返回即可
+      // 如果希望"结束后重置为第二天"，可以在这里重新设置 endTimeStr
       return
     }
-    
-    // 计算小时、分钟、秒
+
     const h = Math.floor(remaining / (1000 * 60 * 60))
     const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
     const s = Math.floor((remaining % (1000 * 60)) / 1000)
-    
-    // 补零
+
     hour.value = h.toString().padStart(2, '0')
     minute.value = m.toString().padStart(2, '0')
     second.value = s.toString().padStart(2, '0')
   }
-  
-  // 立即更新一次
+
   updateCountdown()
-  // 每秒更新
   countdownTimer = setInterval(updateCountdown, 1000)
 }
 
-// ---------------- 品质推荐（按订单销量前6） ----------------
-const recommendList = ref([])
+// 组件挂载时直接启动倒计时（替代原来的 getSeckillList 调用）
+const initSeckillCountdown = () => {
+  // 方式一：固定到当天 23:59:59
+  const endTime = new Date()
+  endTime.setHours(23, 59, 59, 999)
+
+  // 方式二：想写死具体日期就改成这样
+  // const endTime = new Date('2026-12-31 23:59:59')
+
+  setCountdown(endTime)
+}
+
+// ---------------- 品质推荐（静态数据） ----------------
+const recommendList = ref([
+  { id: 201, name: '有机西兰花 500g', image: 'goods7.jpg',  desc: '当日采摘，脆嫩清甜', price: 12.8, stock: 100, count: 0, soldOut: false },
+  { id: 202, name: '泰国金枕头榴莲',   image: 'goods8.jpg',  desc: '树上熟，香糯绵密',   price: 99.0, stock: 20,  count: 0, soldOut: false },
+  { id: 203, name: '草原羊肉卷 500g',  image: 'goods9.jpg',  desc: '涮煮不膻，鲜嫩多汁', price: 45.9, stock: 50,  count: 0, soldOut: false },
+  { id: 204, name: '鲜活大闸蟹 4只装', image: 'goods10.jpg', desc: '膏满黄肥，鲜活到家', price: 128.0, stock: 0,   count: 0, soldOut: true  },
+  { id: 205, name: '紫皮独头蒜 1kg',   image: 'goods11.jpg', desc: '辛香浓郁，产地直供', price: 8.9,  stock: 200, count: 0, soldOut: false },
+  { id: 206, name: '现磨黑豆浆粉 600g', image: 'goods12.jpg', desc: '无蔗糖添加，冲泡即饮', price: 25.9, stock: 120, count: 0, soldOut: false }
+])
 
 // 购物车核心功能（仅加1，无减1）
 // 从本地购物车同步数据
