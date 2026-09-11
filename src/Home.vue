@@ -285,19 +285,6 @@ const switchTo = (index) => {
 }
 
 // ---------------- 品类入口（对接category表） ----------------
-const categoryList =[{ id: 1, name: '新鲜蔬菜', image: '1.jpg' },
-  { id: 2, name: '时令水果', image: '2.jpg' },
-  { id: 3, name: '肉禽蛋品', image: '3.jpg' },
-  { id: 4, name: '海鲜水产', image: '4.jpg' },
-  { id: 5, name: '乳品烘焙', image: '5.jpg' },
-  { id: 6, name: '速食冻品', image: '6.jpg' }]
-// 点击分类跳转至对应商品列表
-const goToCategoryList = (categoryId) => {
-  // 实际项目中跳转至商品列表页并携带分类ID
-  window.location.href = `/list?category_id=${categoryId}`
-}
-// 获取品类数据
-import { ref } from 'vue'
 
 // 初始为空数组，由 getCategoryList 填充
 const categoryList = ref([])
@@ -324,7 +311,10 @@ const getCategoryList = async () => {
     loading.value.category = false
   }
 }
-
+const goToCategoryList = (categoryId) => {
+  // 实际项目中跳转至商品列表页并携带分类ID
+  window.location.href = `/list?category_id=${categoryId}`
+}
 // ---------------- 限时秒杀（对接营销活动表） ----------------
 const seckillList = ref([])
 const hour = ref('00')
