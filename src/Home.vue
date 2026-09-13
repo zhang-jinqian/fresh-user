@@ -93,10 +93,8 @@
       <div class="category-wrapper">
         <h2 class="section-title">精选品类</h2>
         <!-- 加载中提示 -->
-        <div v-if="loading.category" class="loading-tip">加载中...</div>
-        <!-- 空数据提示 -->
-        <div v-else-if="categoryList.length === 0" class="empty-tip">暂无分类数据</div>
-        <div v-else class="category-list">
+       <div v-if="categoryList.length === 0" class="empty-tip">暂无分类数据</div>
+<div v-else class="category-list">
           <div
             v-for="category in categoryList"
             :key="category.id"
@@ -287,32 +285,17 @@ const switchTo = (index) => {
 // ---------------- 品类入口（对接category表） ----------------
 
 // 初始为空数组，由 getCategoryList 填充
-const categoryList = ref([])
-
-// 静态分类数据
-const mockCategoryList = [
+// ---------------- 品类入口（静态数据） ----------------
+const categoryList = ref([
   { id: 1, name: '新鲜蔬菜', image: import.meta.env.BASE_URL + '1.jpg' },
   { id: 2, name: '时令水果', image: import.meta.env.BASE_URL + '2.jpg' },
   { id: 3, name: '肉禽蛋品', image: import.meta.env.BASE_URL + '3.jpg' },
   { id: 4, name: '海鲜水产', image: import.meta.env.BASE_URL + '4.jpg' },
   { id: 5, name: '乳品烘焙', image: import.meta.env.BASE_URL + '5.jpg' },
   { id: 6, name: '速食冻品', image: import.meta.env.BASE_URL + '6.jpg' }
-]
+])
 
-const getCategoryList = async () => {
-  try {
-    loading.value.category = true
- await new Promise(r => setTimeout(r, 200))
-    categoryList.value = mockCategoryList
-  } catch (error) {
-    console.error('获取品类数据失败：', error)
-    categoryList.value = []
-  } finally {
-    loading.value.category = false
-  }
-}
 const goToCategoryList = (categoryId) => {
-  // 实际项目中跳转至商品列表页并携带分类ID
   window.location.href = `/list?category_id=${categoryId}`
 }
 // ---------------- 限时秒杀（对接营销活动表） ----------------
