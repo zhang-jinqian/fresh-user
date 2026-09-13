@@ -423,20 +423,72 @@ const initSeckillCountdown = () => {
   const endTime = new Date()
   endTime.setHours(23, 29, 59, 999)
 
-  // 方式二：想写死具体日期就改成这样
-  // const endTime = new Date('2026-12-31 23:59:59')
 
   setCountdown(endTime)
 }
 
 // ---------------- 品质推荐（静态数据） ----------------
 const recommendList = ref([
-  { id: 201, name: '有机西兰花 500g', image: 'goods7.jpg',  desc: '当日采摘，脆嫩清甜', price: 12.8, stock: 100, count: 0, soldOut: false },
-  { id: 202, name: '泰国金枕头榴莲',   image: 'goods8.jpg',  desc: '树上熟，香糯绵密',   price: 99.0, stock: 20,  count: 0, soldOut: false },
-  { id: 203, name: '草原羊肉卷 500g',  image: 'goods9.jpg',  desc: '涮煮不膻，鲜嫩多汁', price: 45.9, stock: 50,  count: 0, soldOut: false },
-  { id: 204, name: '鲜活大闸蟹 4只装', image: 'goods10.jpg', desc: '膏满黄肥，鲜活到家', price: 128.0, stock: 0,   count: 0, soldOut: true  },
-  { id: 205, name: '紫皮独头蒜 1kg',   image: 'goods11.jpg', desc: '辛香浓郁，产地直供', price: 8.9,  stock: 200, count: 0, soldOut: false },
-  { id: 206, name: '现磨黑豆浆粉 600g', image: 'goods12.jpg', desc: '无蔗糖添加，冲泡即饮', price: 25.9, stock: 120, count: 0, soldOut: false }
+ {
+    id: 4,
+    name: '西兰花',
+    image: BASE + 'goods6.jpg',
+    desc: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。',
+    price: 8.00,
+    stock: 26,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 8,
+    name: '赣南脐橙',
+    image: import.meta.env.BASE_URL + 'good1.jpg',
+    desc: '果皮橙黄光滑，果肉饱满，汁水充沛，维 C 含量高。',
+    price: 5.50,
+    stock: 37,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 10,
+    name: '带皮五花肉',
+    image:import.meta.env.BASE_URL + 'good1.jpg',
+    desc: '肥瘦相间，层次分明，适合红烧、炖煮或做卤肉饭。',
+    price: 14.00,
+    stock: 40,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 14,
+    name: '鲜活鲫鱼',
+    image:import.meta.env.BASE_URL + 'good1.jpg',
+    desc: '肉质细嫩，刺少味鲜，适合煲汤或红烧，营养滋补。',
+    price: 13.00,
+    stock: 29,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 18,
+    name: '原味酸奶',
+    image:import.meta.env.BASE_URL + 'good1.jpg',
+    desc: '质地浓稠，酸甜适中，含益生菌，有助肠道健康。',
+    price: 7.00,
+    stock: 12,
+    count: 0,
+    soldOut: false
+  },
+  {
+    id: 20,
+    name: '深海鳕鱼排',
+    image: import.meta.env.BASE_URL + 'good1.jpg',
+    desc: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',
+    price: 15.00,
+    stock: 30,
+    count: 0,
+    soldOut: false
+  }
 ])
 
 // 购物车核心功能（仅加1，无减1）
