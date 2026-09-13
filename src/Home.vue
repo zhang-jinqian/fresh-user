@@ -291,12 +291,12 @@ const categoryList = ref([])
 
 // 静态分类数据
 const mockCategoryList = [
-  { id: 1, name: '新鲜蔬菜', image: '1.jpg' },
-  { id: 2, name: '时令水果', image: '2.jpg' },
-  { id: 3, name: '肉禽蛋品', image: '3.jpg' },
-  { id: 4, name: '海鲜水产', image: '4.jpg' },
-  { id: 5, name: '乳品烘焙', image: '5.jpg' },
-  { id: 6, name: '速食冻品', image: '6.jpg' }
+  { id: 1, name: '新鲜蔬菜', image: import.meta.env.BASE_URL + '1.jpg' },
+  { id: 2, name: '时令水果', image: import.meta.env.BASE_URL + '2.jpg' },
+  { id: 3, name: '肉禽蛋品', image: import.meta.env.BASE_URL + '3.jpg' },
+  { id: 4, name: '海鲜水产', image: import.meta.env.BASE_URL + '4.jpg' },
+  { id: 5, name: '乳品烘焙', image: import.meta.env.BASE_URL + '5.jpg' },
+  { id: 6, name: '速食冻品', image: import.meta.env.BASE_URL + '6.jpg' }
 ]
 
 const getCategoryList = async () => {
