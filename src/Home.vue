@@ -568,8 +568,7 @@ const getRecommendList = async () => {
 onMounted(() => {
   initLoginState()
   startCarousel()
-  getCategoryList()
-  getRecommendList()
+  syncFromLocalCart()
   initSeckillCountdown()
 })
 
