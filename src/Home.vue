@@ -569,8 +569,8 @@ onMounted(() => {
   initLoginState()
   startCarousel()
   getCategoryList()
-  getSeckillList() // 加载秒杀商品
   getRecommendList()
+  initSeckillCountdown()
 })
 
 onUnmounted(() => {
