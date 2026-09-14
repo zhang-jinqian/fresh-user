@@ -306,7 +306,7 @@ const seckillList = ref([
   {
     id: 3,
     name: '西红柿',
-    img: import.meta.env.BASE_URL + 'good1.jpg',
+    img: import.meta.env.BASE_URL + 'good3.jpg',
     price: 6.00,
     discount_value: 3.90,
     original_price: 6.00,
@@ -317,7 +317,7 @@ const seckillList = ref([
   {
     id: 7,
     name: '烟台红富士苹果',
-    img:import.meta.env.BASE_URL + 'good1.jpg',
+    img:import.meta.env.BASE_URL + 'good4.jpeg',
     price: 8.50,
     discount_value: 5.90,
     original_price: 8.50,
@@ -328,7 +328,7 @@ const seckillList = ref([
   {
     id: 13,
     name: '鲜活基围虾',
-    img: import.meta.env.BASE_URL +'good1.jpg',
+    img: import.meta.env.BASE_URL +'good11.jpg',
     price: 35.00,
     discount_value: 25.90,
     original_price: 35.00,
@@ -339,7 +339,7 @@ const seckillList = ref([
   {
     id: 17,
     name: '纯牛奶（全脂）',
-    img:import.meta.env.BASE_URL + 'good1.jpg',
+    img:import.meta.env.BASE_URL + 'good15.jpg',
     price: 5.00,
     discount_value: 3.50,
     original_price: 5.00,
@@ -350,7 +350,7 @@ const seckillList = ref([
   {
     id: 21,
     name: '灌汤小笼包',
-    img: import.meta.env.BASE_URL + 'good1.jpg',
+    img: import.meta.env.BASE_URL + 'good17.jpg',
     price: 19.00,
     discount_value: 12.90,
     original_price: 19.00,
@@ -415,7 +415,7 @@ const recommendList = ref([
  {
     id: 4,
     name: '西兰花',
-    image: import.meta.env.BASE_URL + 'good1.jpg',
+    image: import.meta.env.BASE_URL + 'good2.jpg',
     desc: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。',
     price: 8.00,
     stock: 26,
@@ -425,7 +425,7 @@ const recommendList = ref([
   {
     id: 8,
     name: '赣南脐橙',
-    image: import.meta.env.BASE_URL + 'good1.jpg',
+    image: import.meta.env.BASE_URL + 'good6.jpeg',
     desc: '果皮橙黄光滑，果肉饱满，汁水充沛，维 C 含量高。',
     price: 5.50,
     stock: 37,
@@ -435,7 +435,7 @@ const recommendList = ref([
   {
     id: 10,
     name: '带皮五花肉',
-    image:import.meta.env.BASE_URL + 'good1.jpg',
+    image:import.meta.env.BASE_URL + 'good7.jpg',
     desc: '肥瘦相间，层次分明，适合红烧、炖煮或做卤肉饭。',
     price: 14.00,
     stock: 40,
@@ -445,7 +445,7 @@ const recommendList = ref([
   {
     id: 14,
     name: '鲜活鲫鱼',
-    image:import.meta.env.BASE_URL + 'good1.jpg',
+    image:import.meta.env.BASE_URL + 'good10.jpg',
     desc: '肉质细嫩，刺少味鲜，适合煲汤或红烧，营养滋补。',
     price: 13.00,
     stock: 29,
@@ -455,7 +455,7 @@ const recommendList = ref([
   {
     id: 18,
     name: '原味酸奶',
-    image:import.meta.env.BASE_URL + 'good1.jpg',
+    image:import.meta.env.BASE_URL + 'good16.jpg',
     desc: '质地浓稠，酸甜适中，含益生菌，有助肠道健康。',
     price: 7.00,
     stock: 12,
@@ -465,7 +465,7 @@ const recommendList = ref([
   {
     id: 20,
     name: '深海鳕鱼排',
-    image: import.meta.env.BASE_URL + 'good1.jpg',
+    image: import.meta.env.BASE_URL + 'good19.jpg',
     desc: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',
     price: 15.00,
     stock: 30,
