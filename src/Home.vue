@@ -415,7 +415,7 @@ const recommendList = ref([
  {
     id: 4,
     name: '西兰花',
-    image: import.meta.env.BASE_URL + 'good2.jpg',
+    image: import.meta.env.BASE_URL + 'good2.png',
     desc: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。',
     price: 8.00,
     stock: 26,
