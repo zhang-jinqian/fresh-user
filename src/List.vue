@@ -99,112 +99,74 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import axios from 'axios'
+import { ref, computed, watch, onMounted } from 'vue'
 import FreshNav from './components/HeaderNav.vue'
 import { useRouter, useRoute } from 'vue-router'
 
-// 初始化路由
 const router = useRouter()
 const route = useRoute()
 
-// 配置 axios 基础路径
-axios.defaults.baseURL = 'http://localhost/cai/api'
+// 图片基础路径（与首页保持一致）
+const BASE = import.meta.env.BASE_URL
 
 // 搜索关键词
 const keyword = ref('')
 
-// 分类数据（从数据库加载）
-const categories = ref([])
-
 // 当前选中分类（0=全部商品）
 const activeCategory = ref(0)
 
-// 商品原始数据
-const goodsData = ref([])
+// ---------------- 分类静态数据（数据库 category 表） ----------------
+const categories = ref([
+  { id: 1, name: '新鲜蔬菜' },
+  { id: 2, name: '时令水果' },
+  { id: 3, name: '肉禽蛋品' },
+  { id: 4, name: '海鲜水产' },
+  { id: 5, name: '乳品烘焙' },
+  { id: 6, name: '速食冻品' }
+])
 
-// 加载分类数据
-const loadCategoryData = async () => {
-  try {
-    const res = await axios.get('/category_list.php')
-    if (res.data.code === 200) {
-      categories.value = res.data.data
-    } else {
-      alert('加载分类失败：' + res.data.msg)
-    }
-  } catch (error) {
-    console.error('加载分类错误：', error)
-    alert('加载分类失败，请检查接口')
-  }
-}
+// ---------------- 商品静态数据（数据库 products 表） ----------------
+// 图片文件名：good1.jpg ~ good18.jpg，放在 public 根目录
+const goodsData = ref([
+  // 新鲜蔬菜
+  { id: 3,  categoryId: 1, name: '西红柿',           spec: '沙瓤多汁，酸甜浓郁，可生食或做番茄炒蛋。',   price: 6.00,  originPrice: 8.00,  img: BASE + 'good1.jpg',  stock: 46, hot: 1, count: 0, soldOut: false },
+  { id: 4,  categoryId: 1, name: '西兰花',           spec: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。', price: 8.00,  originPrice: 10.00, img: BASE + 'good2.jpg',  stock: 26, hot: 1, count: 0, soldOut: false },
+  { id: 6,  categoryId: 1, name: '上海青',           spec: '叶片肥厚脆嫩，清炒或煮汤口感清甜，富含维生素。', price: 5.00,  originPrice: 6.50,  img: BASE + 'good3.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
 
-// 加载商品数据（同步更新地址栏参数）
-const loadGoodsData = async (updateUrl = true) => {
-  try {
-    // 1. 更新地址栏参数（保留关键词）
-    if (updateUrl) {
-      router.push({
-        path: '/list',
-        query: {
-          category_id: activeCategory.value,
-          keyword: keyword.value.trim() || undefined // 无关键词则不显示
-        }
-      }, undefined, { replace: true }) // 替换历史记录，不新增
-    }
+  // 时令水果
+  { id: 7,  categoryId: 2, name: '烟台红富士苹果',   spec: '果面红润带条纹，脆甜多汁，带冰糖心，果香浓郁。', price: 8.50,  originPrice: 12.00, img: BASE + 'good4.jpg',  stock: 30, hot: 1, count: 0, soldOut: false },
+  { id: 8,  categoryId: 2, name: '赣南脐橙',         spec: '果皮橙黄光滑，果肉饱满，汁水充沛，维 C 含量高。', price: 5.50,  originPrice: 8.00,  img: BASE + 'good5.jpg',  stock: 37, hot: 0, count: 0, soldOut: false },
+  { id: 9,  categoryId: 2, name: '红颜草莓',         spec: '果实饱满鲜红，香气浓郁，果肉细腻，酸甜适口。',   price: 15.00, originPrice: 22.00, img: BASE + 'good6.jpg',  stock: 34, hot: 0, count: 0, soldOut: false },
 
-    // 2. 请求商品数据
-    const res = await axios.get('/goods.php', {
-      params: {
-        categoryId: activeCategory.value, // 传给后端的参数名
-        keyword: keyword.value.trim()
-      }
-    })
-    if (res.data.code === 200) {
-      // 初始化购物车数量为0
-      goodsData.value = res.data.data.map(item => ({
-        ...item,
-        count: 0
-      }))
-      // 同步本地购物车数据
-      syncFromLocalCart()
-    } else {
-      alert('加载商品失败：' + (res.data.msg || '后端返回异常'))
-    }
-  } catch (error) {
-    console.error('加载商品错误详情:', error)
-    let errMsg = '网络异常'
-    if (error.response) {
-      errMsg = `请求失败[${error.response.status}]: ${error.response.data?.msg || '未知错误'}`
-    } else if (error.request) {
-      errMsg = '未收到后端响应，请检查接口地址或服务器'
-    } else {
-      errMsg = error.message
-    }
-    alert('加载商品失败：' + errMsg)
-  }
-}
+  // 肉禽蛋品
+  { id: 10, categoryId: 3, name: '带皮五花肉',       spec: '肥瘦相间，层次分明，适合红烧、炖煮或做卤肉饭。', price: 14.00, originPrice: 18.00, img: BASE + 'good7.jpg',  stock: 40, hot: 1, count: 0, soldOut: false },
+  { id: 11, categoryId: 3, name: '鸡胸肉（去皮）',   spec: '肉质紧实低脂，高蛋白，适合健身人群，可煎可煮。', price: 9.00,  originPrice: 12.00, img: BASE + 'good8.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
+  { id: 12, categoryId: 3, name: '鲜鸡蛋（土鸡蛋）', spec: '蛋壳浅褐，蛋黄饱满，口感香浓，营养更天然。',     price: 6.00,  originPrice: 8.00,  img: BASE + 'good9.jpg',  stock: 46, hot: 0, count: 0, soldOut: false },
 
-// 从本地购物车同步数量
-const syncFromLocalCart = () => {
-  const cartStr = localStorage.getItem('cartList')
-  if (!cartStr) return
-  
-  try {
-    const cartList = JSON.parse(cartStr)
-    goodsData.value.forEach(goods => {
-      const cartItem = cartList.find(item => item.id === goods.id)
-      if (cartItem) {
-        goods.count = cartItem.count
-      }
-    })
-  } catch (e) {
-    console.error('解析购物车数据失败：', e)
-  }
-}
+  // 海鲜水产
+  { id: 13, categoryId: 4, name: '鲜活基围虾',       spec: '壳薄肉嫩，鲜甜弹牙，适合白灼、油焖或做虾滑。',   price: 35.00, originPrice: 45.00, img: BASE + 'good10.jpg', stock: 34, hot: 1, count: 0, soldOut: false },
+  { id: 14, categoryId: 4, name: '鲜活鲫鱼',         spec: '肉质细嫩，刺少味鲜，适合煲汤或红烧，营养滋补。',   price: 13.00, originPrice: 18.00, img: BASE + 'good11.jpg', stock: 29, hot: 1, count: 0, soldOut: false },
+  { id: 15, categoryId: 4, name: '花蛤',             spec: '肉质肥美，汤汁鲜甜，适合辣炒或做花甲粉。',         price: 8.00,  originPrice: 10.00, img: BASE + 'good12.jpg', stock: 20, hot: 0, count: 0, soldOut: false },
 
-// 筛选后的商品列表
+  // 乳品烘焙
+  { id: 16, categoryId: 5, name: '原味吐司面包',     spec: '组织松软细腻，麦香浓郁，可做三明治或直接食用。',   price: 13.00, originPrice: 16.00, img: BASE + 'good13.jpg', stock: 6,  hot: 1, count: 0, soldOut: false },
+  { id: 17, categoryId: 5, name: '纯牛奶（全脂）',   spec: '奶香醇厚，口感顺滑，富含蛋白质和钙，适合日常饮用。', price: 5.00,  originPrice: 7.00,  img: BASE + 'good14.jpg', stock: 37, hot: 1, count: 0, soldOut: false },
+  { id: 18, categoryId: 5, name: '原味酸奶',         spec: '质地浓稠，酸甜适中，含益生菌，有助肠道健康。',     price: 7.00,  originPrice: 9.00,  img: BASE + 'good15.jpg', stock: 12, hot: 1, count: 0, soldOut: false },
+
+  // 速食冻品
+  { id: 19, categoryId: 6, name: '速冻猪肉白菜水饺', spec: '皮薄馅足，汤汁浓郁，煮制方便，是快捷早餐或晚餐。', price: 20.00, originPrice: 25.00, img: BASE + 'good16.jpg', stock: 48, hot: 0, count: 0, soldOut: false },
+  { id: 20, categoryId: 6, name: '深海鳕鱼排',       spec: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',   price: 15.00, originPrice: 20.00, img: BASE + 'good17.jpg', stock: 30, hot: 1, count: 0, soldOut: false },
+  { id: 21, categoryId: 6, name: '灌汤小笼包',       spec: '皮薄透光，汤汁鲜美，肉馅饱满，蒸制即食。',         price: 19.00, originPrice: 24.00, img: BASE + 'good18.jpg', stock: 30, hot: 1, count: 0, soldOut: false }
+])
+
+// ---------------- 商品筛选（分类 + 关键词） ----------------
 const showGoodsList = computed(() => {
-  return goodsData.value
+  return goodsData.value.filter(item => {
+    const matchCategory = activeCategory.value === 0 || item.categoryId === activeCategory.value
+    const kw = keyword.value.trim()
+    const matchKeyword = !kw || item.name.includes(kw) || (item.spec && item.spec.includes(kw))
+    return matchCategory && matchKeyword
+  })
 })
 
 // 获取分类名称
@@ -214,18 +176,53 @@ const getCategoryName = (categoryId) => {
   return category ? category.name : '全部商品'
 }
 
-// 切换分类（更新地址栏+加载数据）
-const changeCategory = (id) => {
-  activeCategory.value = id
-  loadGoodsData(true) // 同步更新地址栏
+// ---------------- 购物车同步 ----------------
+const syncFromLocalCart = () => {
+  const cartStr = localStorage.getItem('cartList')
+  if (!cartStr) return
+
+  try {
+    const cartList = JSON.parse(cartStr)
+    goodsData.value.forEach(goods => {
+      const cartItem = cartList.find(item => item.id === goods.id)
+      if (cartItem) goods.count = cartItem.count
+    })
+  } catch (e) {
+    console.error('解析购物车数据失败：', e)
+  }
 }
 
-// 搜索商品（更新地址栏+加载数据）
-const searchGoods = () => {
-  loadGoodsData(true)
+const syncToLocalCart = () => {
+  // 只保存当前列表页出现过的商品，避免覆盖首页推荐数据
+  let cartList = []
+  const existingCartStr = localStorage.getItem('cartList')
+  if (existingCartStr) {
+    try { cartList = JSON.parse(existingCartStr) } catch (e) { cartList = [] }
+  }
+
+  goodsData.value.forEach(item => {
+    const idx = cartList.findIndex(c => c.id === item.id)
+    if (item.count > 0) {
+      const entry = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        img: item.img,
+        count: item.count,
+        checked: true
+      }
+      if (idx > -1) cartList[idx] = { ...cartList[idx], ...entry }
+      else cartList.push(entry)
+    } else if (idx > -1) {
+      // 数量归零则移除
+      cartList.splice(idx, 1)
+    }
+  })
+
+  localStorage.setItem('cartList', JSON.stringify(cartList))
 }
 
-// 购物车操作
+// ---------------- 购物车操作 ----------------
 const plusCount = (goods) => {
   goods.count++
   syncToLocalCart()
@@ -238,26 +235,38 @@ const minusCount = (goods) => {
   }
 }
 
-// 同步到本地购物车
-const syncToLocalCart = () => {
-  const cartGoods = goodsData.value.filter(item => item.count > 0)
-  const cartList = cartGoods.map(item => ({
-    id: item.id,
-    name: item.name,
-    price: item.price,
-    img: item.img,
-    count: item.count,
-    checked: true
-  }))
-  localStorage.setItem('cartList', JSON.stringify(cartList))
-}
+// 购物车总数（保留原功能，虽然模板里已隐藏购物车入口）
+const totalCount = computed(() => {
+  return goodsData.value.reduce((sum, goods) => sum + goods.count, 0)
+})
 
-// 显示购物车
 const showCart = () => {
   alert(`购物车共有 ${totalCount.value} 件商品，可前往结算`)
 }
 
-// 跳转到商品详情页
+// ---------------- 分类切换 & 搜索（仅改状态 + 更新地址栏） ----------------
+const changeCategory = (id) => {
+  activeCategory.value = id
+  router.push({
+    path: '/list',
+    query: {
+      category_id: id,
+      keyword: keyword.value.trim() || undefined
+    }
+  }, undefined, { replace: true })
+}
+
+const searchGoods = () => {
+  router.push({
+    path: '/list',
+    query: {
+      category_id: activeCategory.value,
+      keyword: keyword.value.trim() || undefined
+    }
+  }, undefined, { replace: true })
+}
+
+// 跳转商品详情
 const goToDetail = (goods) => {
   router.push({
     path: '/goods/detail',
@@ -265,28 +274,19 @@ const goToDetail = (goods) => {
   })
 }
 
-// 监听地址栏参数变化（刷新/手动修改地址栏时自动识别）
-watch([() => route.query.category_id, () => route.query.keyword], ([newCatId, newKeyword]) => {
-  // 更新分类
-  if (newCatId !== undefined) {
+// ---------------- 监听地址栏参数 ----------------
+watch(
+  [() => route.query.category_id, () => route.query.keyword],
+  ([newCatId, newKeyword]) => {
     activeCategory.value = Number(newCatId) || 0
-  }
-  // 更新关键词
-  if (newKeyword !== undefined) {
-    keyword.value = newKeyword
-  }
-  // 重新加载数据（不重复更新地址栏）
-  loadGoodsData(false)
-}, { immediate: true })
+    keyword.value = newKeyword || ''
+  },
+  { immediate: true }
+)
 
-// 页面加载时初始化
+// ---------------- 生命周期 ----------------
 onMounted(() => {
-  loadCategoryData()
-})
-
-// 购物车总数
-const totalCount = computed(() => {
-  return goodsData.value.reduce((sum, goods) => sum + goods.count, 0)
+  syncFromLocalCart()
 })
 </script>
 
