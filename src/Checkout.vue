@@ -111,11 +111,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import FreshNav from './components/HeaderNav.vue'
 
 const router = useRouter()
-axios.defaults.baseURL = 'http://localhost/cai/api'
 
 // 地址表单
 const addressForm = ref({
@@ -125,45 +123,49 @@ const addressForm = ref({
 })
 const submitCheck = ref(false)
 const orderGoods = ref([])
-// 优惠券相关
-const showCouponList = ref(false) // 优惠券列表展开/收起
-const usableCoupons = ref([]) // 可用优惠券列表
-const selectedCoupon = ref({}) // 选中的优惠券
 
-// 计算商品总价
+// 优惠券相关
+const showCouponList = ref(false)
+const usableCoupons = ref([])
+const selectedCoupon = ref({})
+
+// 当前用户
+let currentUser = null
+
+// ========== 默认优惠券池（每个用户首次登录时自动发放） ==========
+const DEFAULT_COUPONS = [
+  { id: 1, discount_value: 5,  min_amount: 0,   end_time: '2026-12-31 23:59:59' },
+  { id: 2, discount_value: 10, min_amount: 50,  end_time: '2026-12-31 23:59:59' },
+  { id: 3, discount_value: 20, min_amount: 100, end_time: '2026-12-31 23:59:59' }
+]
+
+// ========== 计算逻辑（保留原逻辑） ==========
 const totalAmount = computed(() => {
   return orderGoods.value.reduce((sum, item) => sum + item.price * item.count, 0)
 })
 
-// 计算优惠券抵扣金额
 const discountAmount = computed(() => {
   if (!selectedCoupon.value.id) return 0
-  // 如果是满减券，判断是否满足使用条件
   if (selectedCoupon.value.min_amount > 0 && totalAmount.value < selectedCoupon.value.min_amount) {
     return 0
   }
-  // 抵扣金额不能超过商品总价
   return Math.min(selectedCoupon.value.discount_value, totalAmount.value)
 })
 
-// 计算实付金额
 const payAmount = computed(() => {
   const amount = totalAmount.value - discountAmount.value
   return amount < 0 ? 0 : amount
 })
 
-// 判断优惠券是否可用
 const isCouponUsable = (coupon) => {
   return coupon.min_amount <= totalAmount.value
 }
 
-// 格式化时间
 const formatTime = (timeStr) => {
   if (!timeStr) return ''
   return timeStr.split(' ')[0]
 }
 
-// 选择优惠券
 const selectCoupon = (coupon) => {
   if (isCouponUsable(coupon)) {
     selectedCoupon.value = coupon
@@ -172,60 +174,116 @@ const selectCoupon = (coupon) => {
   }
 }
 
-// 取消选中优惠券
 const cancelCoupon = () => {
   selectedCoupon.value = {}
 }
 
-// 查询用户可用优惠券
-const getUsableCoupons = async (userId) => {
-  try {
-    const res = await axios.get('/user_coupon_used.php', {
-      params: {
+// ========== 用户优惠券（存 localStorage.userCoupons） ==========
+const loadUserCoupons = () => {
+  const str = localStorage.getItem('userCoupons')
+  if (!str) return []
+  try { return JSON.parse(str) || [] } catch (e) { return [] }
+}
+
+const saveUserCoupons = (list) => {
+  localStorage.setItem('userCoupons', JSON.stringify(list))
+}
+
+// 取某用户当前可用的优惠券
+const getUsableCoupons = (userId) => {
+  let all = loadUserCoupons()
+
+  // 如果该用户还没有券，发放默认券
+  const hasAny = all.some(c => c.user_id === userId)
+  if (!hasAny) {
+    DEFAULT_COUPONS.forEach(c => {
+      all.push({
+        id: Date.now() + c.id,          // 生成唯一 id
         user_id: userId,
-        type: 'usable' // 查询可用优惠券
-      }
+        discount_value: c.discount_value,
+        min_amount: c.min_amount,
+        end_time: c.end_time,
+        used: 0                          // 0 未使用 / 1 已使用
+      })
     })
-    if (res.data.code === 200) {
-      usableCoupons.value = res.data.data
-    }
-  } catch (err) {
-    console.error('查询优惠券失败：', err)
+    saveUserCoupons(all)
+  }
+
+  // 过滤：属于该用户 + 未使用 + 未过期
+  const now = new Date()
+  usableCoupons.value = all.filter(c =>
+    c.user_id === userId &&
+    c.used === 0 &&
+    new Date(c.end_time) >= now
+  )
+}
+
+// 标记优惠券为已使用
+const markCouponUsed = (userId, couponId) => {
+  const all = loadUserCoupons()
+  const idx = all.findIndex(c => c.id === couponId && c.user_id === userId)
+  if (idx > -1) {
+    all[idx].used = 1
+    saveUserCoupons(all)
   }
 }
 
-// 初始化购物车商品
+// ========== 购物车读取 ==========
 const initOrderGoods = () => {
+  const userInfoStr = localStorage.getItem('userInfo')
+  if (!userInfoStr) {
+    alert('请先登录！')
+    router.push('/login')
+    return
+  }
+  currentUser = JSON.parse(userInfoStr)
+
   const cartStr = localStorage.getItem('cartList')
-  if (cartStr) {
-    try {
-      const cartList = JSON.parse(cartStr)
-      orderGoods.value = cartList.filter(item => item.checked)
-      if (orderGoods.value.length === 0) {
-        alert('请选择要结算的商品！')
-        router.push('/cart')
-      } else {
-        // 获取用户信息并查询优惠券
-        const userInfoStr = localStorage.getItem('userInfo')
-        if (userInfoStr) {
-          const userInfo = JSON.parse(userInfoStr)
-          getUsableCoupons(userInfo.id)
-        }
-      }
-    } catch (e) {
-      console.error('解析购物车失败：', e)
-      router.push('/cart')
-    }
-  } else {
+  if (!cartStr) {
     alert('购物车为空！')
+    router.push('/cart')
+    return
+  }
+
+  try {
+    const cartList = JSON.parse(cartStr)
+    orderGoods.value = cartList.filter(item => item.checked)
+
+    if (orderGoods.value.length === 0) {
+      alert('请选择要结算的商品！')
+      router.push('/cart')
+      return
+    }
+
+    // 加载优惠券
+    getUsableCoupons(currentUser.id)
+
+    // 顺带回填上次用过的地址，提升体验（可选）
+    const savedAddr = localStorage.getItem('userAddress')
+    if (savedAddr) {
+      try {
+        const arr = JSON.parse(savedAddr)
+        const last = arr.find(a => a.user_id === currentUser.id)
+        if (last) {
+          addressForm.value = {
+            name: last.name,
+            phone: last.phone,
+            address: last.address
+          }
+        }
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.error('解析购物车失败：', e)
     router.push('/cart')
   }
 }
 
-// 提交订单
-const submitOrder = async () => {
+// ========== 提交订单（静态版） ==========
+const submitOrder = () => {
   submitCheck.value = true
-  // 1. 校验地址表单
+
+  // 1. 校验地址
   if (!addressForm.value.name.trim()) {
     alert('请输入收货人姓名！')
     return
@@ -239,7 +297,7 @@ const submitOrder = async () => {
     return
   }
 
-  // 2. 获取用户信息
+  // 2. 用户校验
   const userInfoStr = localStorage.getItem('userInfo')
   if (!userInfoStr) {
     alert('请先登录！')
@@ -248,64 +306,84 @@ const submitOrder = async () => {
   }
   const userInfo = JSON.parse(userInfoStr)
 
-  try {
-    // 3. 第一步：把地址存入address表
-    const addressRes = await axios.post('/address.php', {
-      user_id: userInfo.id,
-      name: addressForm.value.name,
-      phone: addressForm.value.phone,
-      address: addressForm.value.address
-    })
-
-    if (addressRes.data.code !== 200) {
-      alert('保存地址失败：' + addressRes.data.msg)
-      return
-    }
-    const addressId = addressRes.data.data.address_id
-
-    // 4. 第二步：创建订单（含优惠券ID）
-    const orderRes = await axios.post('/order.php', {
-      user_id: userInfo.id,
-      total_amount: totalAmount.value,
-      discount_amount: discountAmount.value,
-      pay_amount: payAmount.value,
-      coupon_id: selectedCoupon.value.id || 0,
-      address_id: addressId,
-      goods: orderGoods.value.map(item => ({
-        goods_id: item.id,
-        name: item.name,
-        price: item.price,
-        count: item.count,
-        img: item.img
-      }))
-    })
-
-    if (orderRes.data.code === 200) {
-      // 5. ✅ 标记优惠券为已使用（修正传参方式）
-     
-if (selectedCoupon.value.id) {
-  await axios.post('/user_coupon_used.php', {
+  // 3. 保存地址到 localStorage.userAddress
+  let addressList = []
+  try { addressList = JSON.parse(localStorage.getItem('userAddress')) || [] } catch (e) {}
+  const addressId = Date.now()
+  addressList.push({
+    address_id: addressId,
     user_id: userInfo.id,
-    user_coupon_id: selectedCoupon.value.id, // ✅ 用user_coupons.id
-    type: 'use'
+    name: addressForm.value.name,
+    phone: addressForm.value.phone,
+    address: addressForm.value.address,
+    create_time: new Date().toLocaleString()
   })
-}
-      alert('订单创建成功！订单号：' + orderRes.data.data.order_no)
-      // 清空购物车已结算商品
-      const cartStr = localStorage.getItem('cartList')
-      if (cartStr) {
-        const cartList = JSON.parse(cartStr)
-        const newCartList = cartList.filter(item => !item.checked)
-        localStorage.setItem('cartList', JSON.stringify(newCartList))
-      }
-      router.push('/order-list')
-    } else {
-      alert('创建订单失败：' + orderRes.data.msg)
-    }
-  } catch (error) {
-    console.error('提交订单失败：', error)
-    alert('网络异常，请重试！')
+  localStorage.setItem('userAddress', JSON.stringify(addressList))
+
+  // 4. 生成订单号：DD + yyyyMMddHHmmss + 3位随机
+  const now = new Date()
+  const pad = (n, len = 2) => String(n).padStart(len, '0')
+  const orderNo = 'DD'
+    + now.getFullYear()
+    + pad(now.getMonth() + 1)
+    + pad(now.getDate())
+    + pad(now.getHours())
+    + pad(now.getMinutes())
+    + pad(now.getSeconds())
+    + pad(Math.floor(Math.random() * 1000), 3)
+
+  // 5. 组装订单数据，写入 localStorage.orderList
+  const newOrder = {
+    id: Date.now(),
+    order_no: orderNo,
+    user_id: userInfo.id,
+    user_name: userInfo.name,
+    user_phone: userInfo.phone,
+    total_amount: Number(totalAmount.value.toFixed(2)),
+    discount_amount: Number(discountAmount.value.toFixed(2)),
+    pay_amount: Number(payAmount.value.toFixed(2)),
+    coupon_id: selectedCoupon.value.id || 0,
+    coupon_info: selectedCoupon.value.id
+      ? {
+          discount_value: selectedCoupon.value.discount_value,
+          min_amount: selectedCoupon.value.min_amount
+        }
+      : null,
+    address_id: addressId,
+    address: { ...addressForm.value },
+    goods: orderGoods.value.map(item => ({
+      goods_id: item.id,
+      name: item.name,
+      price: item.price,
+      count: item.count,
+      img: item.img
+    })),
+    status: 1,                            // 1=待发货
+    create_time: new Date().toLocaleString()
   }
+
+  let orderList = []
+  try { orderList = JSON.parse(localStorage.getItem('orderList')) || [] } catch (e) {}
+  orderList.unshift(newOrder)             // 新的在前
+  localStorage.setItem('orderList', JSON.stringify(orderList))
+
+  // 6. 标记优惠券已使用
+  if (selectedCoupon.value.id) {
+    markCouponUsed(userInfo.id, selectedCoupon.value.id)
+  }
+
+  // 7. 从购物车移除已结算商品
+  const cartStr = localStorage.getItem('cartList')
+  if (cartStr) {
+    try {
+      const cartList = JSON.parse(cartStr)
+      const newCartList = cartList.filter(item => !item.checked)
+      localStorage.setItem('cartList', JSON.stringify(newCartList))
+    } catch (e) {}
+  }
+
+  alert('订单创建成功！订单号：' + orderNo)
+  router.push('/order-list')
 }
 
 onMounted(() => {
