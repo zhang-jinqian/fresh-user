@@ -2,14 +2,12 @@
   <div class="register-page">
     <div class="register-box">
       <div class="logo">
-        <img
-          src="./assets/logo.png"
-          alt="生鲜购">
+        <img src="./assets/logo.png" alt="生鲜购">
         <h2>注册账号</h2>
       </div>
 
-      <!-- 错误提示 -->
       <div class="error-tip" v-if="errorMsg">{{ errorMsg }}</div>
+
       <div class="form-item">
         <input v-model="name" type="text" placeholder="请输入昵称" class="input" />
       </div>
@@ -18,6 +16,7 @@
         <input v-model="phone" type="text" placeholder="请输入手机号" class="input"
           :class="{ error: errorMsg && errorMsg.includes('手机号') }" />
       </div>
+
       <div class="form-item gender-group">
         <span class="gender-label">性别：</span>
         <label class="radio-item">
@@ -30,6 +29,7 @@
           <input type="radio" v-model="gender" value="0" /> 保密
         </label>
       </div>
+
       <div class="form-item">
         <input v-model="password" type="password" placeholder="请设置6~16位密码（含数字和字母）" class="input"
           :class="{ error: errorMsg && errorMsg.includes('密码') }" />
@@ -55,33 +55,47 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios' // 需先安装：npm install axios
 
 const router = useRouter()
 
-// 响应式数据
+// ---------------- 响应式数据 ----------------
+const name = ref('')          // ✅ 补上模板里用到的 name
 const phone = ref('')
+const gender = ref('0')
 const password = ref('')
 const confirmPwd = ref('')
-const loading = ref(false) // 加载状态
-const errorMsg = ref('') // 错误提示
-const gender = ref('0')
-// API 基础路径（根据实际后端地址修改）
-const apiBase = 'http://localhost/cai/api'
+const loading = ref(false)
+const errorMsg = ref('')
 
-// 注册核心逻辑
-const register = async () => {
-  // 清空之前的错误提示
+// ---------------- 本地用户库（与 Login.vue 共用 localStorage.users） ----------------
+const loadUsers = () => {
+  const str = localStorage.getItem('users')
+  if (!str) return []
+  try {
+    const arr = JSON.parse(str)
+    return Array.isArray(arr) ? arr : []
+  } catch (e) {
+    return []
+  }
+}
+
+const saveUsers = (users) => {
+  localStorage.setItem('users', JSON.stringify(users))
+}
+
+// ---------------- 注册逻辑（静态版） ----------------
+const register = () => {
   errorMsg.value = ''
 
-  // 1. 前端表单校验
-  // 手机号校验
+  // 1. 表单校验
+  if (!name.value.trim()) {
+    errorMsg.value = '请输入昵称'
+    return
+  }
   if (!/^1[3-9]\d{9}$/.test(phone.value)) {
     errorMsg.value = '请输入正确的手机号格式'
     return
   }
-
-  // 密码长度 + 复杂度校验
   if (password.value.length < 6 || password.value.length > 16) {
     errorMsg.value = '密码长度需在6-16位之间'
     return
@@ -90,41 +104,39 @@ const register = async () => {
     errorMsg.value = '密码需同时包含数字和字母'
     return
   }
-
-  // 确认密码校验
   if (password.value !== confirmPwd.value) {
     errorMsg.value = '两次输入的密码不一致'
     return
   }
 
-  // 2. 调用后端注册接口
-  try {
-    loading.value = true // 开启加载状态
-    const response = await axios.post(`${apiBase}/user_register.php`, {
-      phone: phone.value,
-      password: password.value // 实际项目中建议前端先加密（如md5）再传
-    })
+  loading.value = true
 
-    // 3. 处理接口返回结果
-    if (response.data.code === 200) {
-      // 注册成功
-      alert('注册成功！请前往登录')
-      router.push('/login') // 修正路由大小写问题
-    } else {
-      // 后端返回的业务错误（如手机号已存在）
-      errorMsg.value = response.data.message || '注册失败，请稍后重试'
+  // 2. 模拟网络延迟
+  setTimeout(() => {
+    const users = loadUsers()
+
+    // 3. 手机号查重
+    if (users.some(u => u.phone === phone.value)) {
+      errorMsg.value = '该手机号已被注册'
+      loading.value = false
+      return
     }
-  } catch (error) {
-    // 网络错误/接口异常处理
-    console.error('注册请求失败：', error)
-    if (error.response && error.response.data && error.response.data.message) {
-      errorMsg.value = error.response.data.message
-    } else {
-      errorMsg.value = '网络异常，请检查网络后重试'
-    }
-  } finally {
-    loading.value = false // 关闭加载状态
-  }
+
+    // 4. 写入本地用户库
+    users.push({
+      // id：用时间戳保证唯一（订单模块会用到）
+      id: Date.now(),
+      phone: phone.value,
+      password: password.value,
+      name: name.value.trim(),
+      gender: gender.value
+    })
+    saveUsers(users)
+
+    loading.value = false
+    alert('注册成功！请前往登录')
+    router.push('/login')
+  }, 400)
 }
 </script>
 
