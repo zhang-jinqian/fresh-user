@@ -190,26 +190,9 @@ const saveUserCoupons = (list) => {
 }
 
 // 取某用户当前可用的优惠券
+// ✅ 只读取，不再自动发放
 const getUsableCoupons = (userId) => {
-  let all = loadUserCoupons()
-
-  // 如果该用户还没有券，发放默认券
-  const hasAny = all.some(c => c.user_id === userId)
-  if (!hasAny) {
-    DEFAULT_COUPONS.forEach(c => {
-      all.push({
-        id: Date.now() + c.id,          // 生成唯一 id
-        user_id: userId,
-        discount_value: c.discount_value,
-        min_amount: c.min_amount,
-        end_time: c.end_time,
-        used: 0                          // 0 未使用 / 1 已使用
-      })
-    })
-    saveUserCoupons(all)
-  }
-
-  // 过滤：属于该用户 + 未使用 + 未过期
+  const all = loadUserCoupons()
   const now = new Date()
   usableCoupons.value = all.filter(c =>
     c.user_id === userId &&
