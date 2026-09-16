@@ -124,7 +124,7 @@ const categories = ref([
 
 // ---------------- 商品静态数据（数据库 products 表） ----------------
 // 图片文件名：good1.jpg ~ good18.jpg，放在 public 根目录
-const goodsData = ref([
+const rawGoodsList = ref([
   // 新鲜蔬菜
   { id: 3,  categoryId: 1, name: '西红柿',           spec: '沙瓤多汁，酸甜浓郁，可生食或做番茄炒蛋。',   price: 6.00,    img: import.meta.env.BASE_URL + 'good3.jpg',  stock: 46, hot: 1, count: 0, soldOut: false },
   { id: 4,  categoryId: 1, name: '西兰花',           spec: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。', price: 8.00,  img: import.meta.env.BASE_URL + 'good2.png',  stock: 26, hot: 1, count: 0, soldOut: false },
