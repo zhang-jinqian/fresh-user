@@ -106,9 +106,6 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-// 图片基础路径（与首页保持一致）
-const BASE = import.meta.env.BASE_URL
-
 // 搜索关键词
 const keyword = ref('')
 
@@ -129,34 +126,34 @@ const categories = ref([
 // 图片文件名：good1.jpg ~ good18.jpg，放在 public 根目录
 const goodsData = ref([
   // 新鲜蔬菜
-  { id: 3,  categoryId: 1, name: '西红柿',           spec: '沙瓤多汁，酸甜浓郁，可生食或做番茄炒蛋。',   price: 6.00,    img: BASE + 'good3.jpg',  stock: 46, hot: 1, count: 0, soldOut: false },
-  { id: 4,  categoryId: 1, name: '西兰花',           spec: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。', price: 8.00,  img: BASE + 'good2.png',  stock: 26, hot: 1, count: 0, soldOut: false },
-  { id: 6,  categoryId: 1, name: '上海青',           spec: '叶片肥厚脆嫩，清炒或煮汤口感清甜，富含维生素。', price: 5.00,   img: BASE + 'good1.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
+  { id: 3,  categoryId: 1, name: '西红柿',           spec: '沙瓤多汁，酸甜浓郁，可生食或做番茄炒蛋。',   price: 6.00,    img: import.meta.env.BASE_URL + 'good3.jpg',  stock: 46, hot: 1, count: 0, soldOut: false },
+  { id: 4,  categoryId: 1, name: '西兰花',           spec: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。', price: 8.00,  img: import.meta.env.BASE_URL + 'good2.png',  stock: 26, hot: 1, count: 0, soldOut: false },
+  { id: 6,  categoryId: 1, name: '上海青',           spec: '叶片肥厚脆嫩，清炒或煮汤口感清甜，富含维生素。', price: 5.00,   img: import.meta.env.BASE_URL + 'good1.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
 
   // 时令水果
-  { id: 7,  categoryId: 2, name: '烟台红富士苹果',   spec: '果面红润带条纹，脆甜多汁，带冰糖心，果香浓郁。', price: 8.50,   img: BASE + 'good4.jpeg',  stock: 30, hot: 1, count: 0, soldOut: false },
-  { id: 8,  categoryId: 2, name: '赣南脐橙',         spec: '果皮橙黄光滑，果肉饱满，汁水充沛，维 C 含量高。', price: 5.50,    img: BASE + 'good6.jpeg',  stock: 37, hot: 0, count: 0, soldOut: false },
-  { id: 9,  categoryId: 2, name: '红颜草莓',         spec: '果实饱满鲜红，香气浓郁，果肉细腻，酸甜适口。',   price: 15.00,  img: BASE + 'good5.jpg',  stock: 34, hot: 0, count: 0, soldOut: false },
+  { id: 7,  categoryId: 2, name: '烟台红富士苹果',   spec: '果面红润带条纹，脆甜多汁，带冰糖心，果香浓郁。', price: 8.50,   img: import.meta.env.BASE_URL + 'good4.jpeg',  stock: 30, hot: 1, count: 0, soldOut: false },
+  { id: 8,  categoryId: 2, name: '赣南脐橙',         spec: '果皮橙黄光滑，果肉饱满，汁水充沛，维 C 含量高。', price: 5.50,    img: import.meta.env.BASE_URL + 'good6.jpeg',  stock: 37, hot: 0, count: 0, soldOut: false },
+  { id: 9,  categoryId: 2, name: '红颜草莓',         spec: '果实饱满鲜红，香气浓郁，果肉细腻，酸甜适口。',   price: 15.00,  img: import.meta.env.BASE_URL + 'good5.jpg',  stock: 34, hot: 0, count: 0, soldOut: false },
 
   // 肉禽蛋品
-  { id: 10, categoryId: 3, name: '带皮五花肉',       spec: '肥瘦相间，层次分明，适合红烧、炖煮或做卤肉饭。', price: 14.00, img: BASE + 'good7.jpg',  stock: 40, hot: 1, count: 0, soldOut: false },
-  { id: 11, categoryId: 3, name: '鸡胸肉（去皮）',   spec: '肉质紧实低脂，高蛋白，适合健身人群，可煎可煮。', price: 9.00,   img: BASE + 'good8.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
-  { id: 12, categoryId: 3, name: '鲜鸡蛋（土鸡蛋）', spec: '蛋壳浅褐，蛋黄饱满，口感香浓，营养更天然。',     price: 6.00,   img: BASE + 'good9.jpg',  stock: 46, hot: 0, count: 0, soldOut: false },
+  { id: 10, categoryId: 3, name: '带皮五花肉',       spec: '肥瘦相间，层次分明，适合红烧、炖煮或做卤肉饭。', price: 14.00, img: import.meta.env.BASE_URL + 'good7.jpg',  stock: 40, hot: 1, count: 0, soldOut: false },
+  { id: 11, categoryId: 3, name: '鸡胸肉（去皮）',   spec: '肉质紧实低脂，高蛋白，适合健身人群，可煎可煮。', price: 9.00,   img: import.meta.env.BASE_URL + 'good8.jpg',  stock: 30, hot: 0, count: 0, soldOut: false },
+  { id: 12, categoryId: 3, name: '鲜鸡蛋（土鸡蛋）', spec: '蛋壳浅褐，蛋黄饱满，口感香浓，营养更天然。',     price: 6.00,   img: import.meta.env.BASE_URL + 'good9.jpg',  stock: 46, hot: 0, count: 0, soldOut: false },
 
   // 海鲜水产
-  { id: 13, categoryId: 4, name: '鲜活基围虾',       spec: '壳薄肉嫩，鲜甜弹牙，适合白灼、油焖或做虾滑。',   price: 35.00,  img: BASE + 'good11.jpg', stock: 34, hot: 1, count: 0, soldOut: false },
-  { id: 14, categoryId: 4, name: '鲜活鲫鱼',         spec: '肉质细嫩，刺少味鲜，适合煲汤或红烧，营养滋补。',   price: 13.00, img: BASE + 'good10.jpg', stock: 29, hot: 1, count: 0, soldOut: false },
-  { id: 15, categoryId: 4, name: '花蛤',             spec: '肉质肥美，汤汁鲜甜，适合辣炒或做花甲粉。',         price: 8.00, img: BASE + 'good12.jpeg', stock: 20, hot: 0, count: 0, soldOut: false },
+  { id: 13, categoryId: 4, name: '鲜活基围虾',       spec: '壳薄肉嫩，鲜甜弹牙，适合白灼、油焖或做虾滑。',   price: 35.00,  img: import.meta.env.BASE_URL + 'good11.jpg', stock: 34, hot: 1, count: 0, soldOut: false },
+  { id: 14, categoryId: 4, name: '鲜活鲫鱼',         spec: '肉质细嫩，刺少味鲜，适合煲汤或红烧，营养滋补。',   price: 13.00, img: import.meta.env.BASE_URL + 'good10.jpg', stock: 29, hot: 1, count: 0, soldOut: false },
+  { id: 15, categoryId: 4, name: '花蛤',             spec: '肉质肥美，汤汁鲜甜，适合辣炒或做花甲粉。',         price: 8.00, img: import.meta.env.BASE_URL + 'good12.jpeg', stock: 20, hot: 0, count: 0, soldOut: false },
 
   // 乳品烘焙
-  { id: 16, categoryId: 5, name: '原味吐司面包',     spec: '组织松软细腻，麦香浓郁，可做三明治或直接食用。',   price: 13.00,  img: BASE + 'good13.jpg', stock: 6,  hot: 1, count: 0, soldOut: false },
-  { id: 17, categoryId: 5, name: '纯牛奶（全脂）',   spec: '奶香醇厚，口感顺滑，富含蛋白质和钙，适合日常饮用。', price: 5.00,   img: BASE + 'good15.jpg', stock: 37, hot: 1, count: 0, soldOut: false },
-  { id: 18, categoryId: 5, name: '原味酸奶',         spec: '质地浓稠，酸甜适中，含益生菌，有助肠道健康。',     price: 7.00,   img: BASE + 'good16.jpg', stock: 12, hot: 1, count: 0, soldOut: false },
+  { id: 16, categoryId: 5, name: '原味吐司面包',     spec: '组织松软细腻，麦香浓郁，可做三明治或直接食用。',   price: 13.00,  img: import.meta.env.BASE_URL + 'good13.jpg', stock: 6,  hot: 1, count: 0, soldOut: false },
+  { id: 17, categoryId: 5, name: '纯牛奶（全脂）',   spec: '奶香醇厚，口感顺滑，富含蛋白质和钙，适合日常饮用。', price: 5.00,   img:import.meta.env.BASE_URL + 'good15.jpg', stock: 37, hot: 1, count: 0, soldOut: false },
+  { id: 18, categoryId: 5, name: '原味酸奶',         spec: '质地浓稠，酸甜适中，含益生菌，有助肠道健康。',     price: 7.00,   img: import.meta.env.BASE_URL + 'good16.jpg', stock: 12, hot: 1, count: 0, soldOut: false },
 
   // 速食冻品
-  { id: 19, categoryId: 6, name: '速冻猪肉白菜水饺', spec: '皮薄馅足，汤汁浓郁，煮制方便，是快捷早餐或晚餐。', price: 20.00, img: BASE + 'good17.jpg', stock: 48, hot: 0, count: 0, soldOut: false },
-  { id: 20, categoryId: 6, name: '深海鳕鱼排',       spec: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',   price: 15.00,  img: BASE + 'good18.png', stock: 30, hot: 1, count: 0, soldOut: false },
-  { id: 21, categoryId: 6, name: '灌汤小笼包',       spec: '皮薄透光，汤汁鲜美，肉馅饱满，蒸制即食。',         price: 19.00, img: BASE + 'good19.jpg', stock: 30, hot: 1, count: 0, soldOut: false }
+  { id: 19, categoryId: 6, name: '速冻猪肉白菜水饺', spec: '皮薄馅足，汤汁浓郁，煮制方便，是快捷早餐或晚餐。', price: 20.00, img: import.meta.env.BASE_URL + 'good17.jpg', stock: 48, hot: 0, count: 0, soldOut: false },
+  { id: 20, categoryId: 6, name: '深海鳕鱼排',       spec: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',   price: 15.00,  img: import.meta.env.BASE_URL + 'good18.png', stock: 30, hot: 1, count: 0, soldOut: false },
+  { id: 21, categoryId: 6, name: '灌汤小笼包',       spec: '皮薄透光，汤汁鲜美，肉馅饱满，蒸制即食。',         price: 19.00, img: import.meta.env.BASE_URL + 'good19.jpg', stock: 30, hot: 1, count: 0, soldOut: false }
 ])
 const goodsData = ref(rawGoodsList.map(item => ({
   ...item,
