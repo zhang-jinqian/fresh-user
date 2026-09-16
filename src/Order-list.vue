@@ -118,13 +118,22 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import FreshNav from './components/HeaderNav.vue'
 
 const router = useRouter()
-axios.defaults.baseURL = 'http://localhost/cai/api'
 
-// 订单列表
+// ---------------- 状态映射 ----------------
+// 结算页写入的数字状态 → 前端字符串状态
+const NUM_TO_STR = {
+  0: 'pending',           // 待付款
+  1: 'paid',              // 待发货
+  2: 'shipped',           // 已发货
+  3: 'completed',         // 已完成
+  4: 'cancelled',         // 已取消
+  5: 'cancel_requested'   // 取消审核中
+}
+
+// ---------------- 订单数据 ----------------
 const orderList = ref([])
 const activeStatus = ref('all')
 
@@ -133,8 +142,19 @@ const showCommentModal = ref(false)
 const currentCommentOrderId = ref(0)
 const commentContent = ref('')
 
-// 初始化订单列表
-const initOrderList = async () => {
+// ---------------- localStorage 读写 ----------------
+const loadOrderList = () => {
+  const str = localStorage.getItem('orderList')
+  if (!str) return []
+  try { return JSON.parse(str) || [] } catch (e) { return [] }
+}
+
+const saveOrderList = (list) => {
+  localStorage.setItem('orderList', JSON.stringify(list))
+}
+
+// ---------------- 初始化：读本地订单 + 按用户过滤 ----------------
+const initOrderList = () => {
   const userInfoStr = localStorage.getItem('userInfo')
   if (!userInfoStr) {
     alert('请先登录！')
@@ -143,35 +163,35 @@ const initOrderList = async () => {
   }
   const userInfo = JSON.parse(userInfoStr)
 
-  try {
-    const res = await axios.post('/order.php', {
-      action: 'list',
-      user_id: userInfo.id
-    })
-    if (res.data.code === 200) {
-      orderList.value = res.data.data
-    } else {
-      alert('获取订单失败：' + res.data.msg)
-    }
-  } catch (error) {
-    console.error('获取订单错误：', error)
-    // 模拟数据（兼容coupon_id=null）
-    
-  }
+  const all = loadOrderList()
+
+  // 只展示当前用户的订单，并统一 status 为字符串
+  orderList.value = all
+    .filter(o => o.user_id === userInfo.id)
+    .map(o => ({
+      ...o,
+      // 数字状态转字符串
+      status: typeof o.status === 'number'
+        ? (NUM_TO_STR[o.status] || 'pending')
+        : o.status,
+      // 兼容字段
+      discount_amount: o.discount_amount || 0,
+      coupon_name: o.coupon_info ? '优惠券' : '',
+      is_commented: o.is_commented ?? 0
+    }))
 }
 
-// 筛选订单
+// ---------------- 筛选 ----------------
 const filteredOrders = computed(() => {
   if (activeStatus.value === 'all') return orderList.value
-  return orderList.value.filter(order => order.status === activeStatus.value)
+  return orderList.value.filter(o => o.status === activeStatus.value)
 })
 
-// 切换筛选状态
 const changeStatus = (status) => {
   activeStatus.value = status
 }
 
-// 状态文字映射
+// ---------------- 状态显示 ----------------
 const getStatusText = (status) => {
   const map = {
     pending: '待付款',
@@ -184,31 +204,48 @@ const getStatusText = (status) => {
   return map[status] || '未知状态'
 }
 
-// 状态样式类
 const getStatusClass = (status) => {
   const map = {
     pending: 'status-pending',
     paid: 'status-paid',
     shipped: 'status-shipped',
     completed: 'status-completed',
-     cancel_requested: 'status-cancel-request',
+    cancel_requested: 'status-cancel-request',
     cancelled: 'status-cancelled'
   }
   return map[status] || ''
 }
 
-// 查看订单详情
+// ---------------- 通用：更新单条订单 ----------------
+const updateOrder = (orderId, patch) => {
+  const all = loadOrderList()
+  const idx = all.findIndex(o => o.id === orderId)
+  if (idx === -1) return false
+  Object.assign(all[idx], patch)
+  saveOrderList(all)
+  initOrderList()
+  return true
+}
+
+// ---------------- 查看详情 ----------------
 const viewOrderDetail = (orderId) => {
   router.push(`/order-detail/${orderId}`)
 }
 
-// 支付订单
+// ---------------- 付款：pending → paid ----------------
 const goPay = (orderId) => {
-  router.push('/pay/' + orderId)
+  const ok = updateOrder(orderId, {
+    status: 'paid',
+    pay_time: new Date().toLocaleString()
+  })
+  if (ok) {
+    alert('付款成功！（本地模拟）')
+  }
 }
-// 申请取消订单（新）
-const requestCancelOrder = async (order) => {
-  // 前端检查7天限制（可选）
+
+// ---------------- 申请取消 ----------------
+const requestCancelOrder = (order) => {
+  // 7 天限制
   const createTime = new Date(order.create_time)
   const now = new Date()
   const diffDays = (now - createTime) / (1000 * 3600 * 24)
@@ -220,83 +257,50 @@ const requestCancelOrder = async (order) => {
   const reason = prompt('请输入取消原因（可选）', '')
   if (reason === null) return
 
-  const userInfoStr = localStorage.getItem('userInfo')
-  const userInfo = JSON.parse(userInfoStr)
-  try {
-    const res = await axios.post('/order.php', {
-      action: 'request_cancel',
-      order_id: order.id,
-      user_id: userInfo.id,
-      reason: reason
-    })
-    if (res.data.code === 200) {
-      alert('取消申请已提交，等待管理员审核')
-      initOrderList() // 刷新列表，状态变为 cancel_requested
-    } else {
-      alert(res.data.msg)
-    }
-  } catch (err) {
-    console.error(err)
-    alert('提交失败，请重试')
-  }
+  const ok = updateOrder(order.id, {
+    status: 'cancel_requested',
+    cancel_reason: reason,
+    cancel_request_time: new Date().toLocaleString()
+  })
+  if (ok) alert('取消申请已提交，等待管理员审核')
 }
 
-
-// 确认收货
-const confirmReceipt = async (orderId) => {
+// ---------------- 确认收货：shipped → completed ----------------
+const confirmReceipt = (orderId) => {
   if (!confirm('确定确认收货？')) return
-  try {
-    const res = await axios.put('/order.php', { id: orderId, action: 'confirm' })
-    if (res.data.code === 200) {
-      alert('确认收货成功！')
-      initOrderList()
-    } else {
-      alert('确认收货失败：' + res.data.msg)
-    }
-  } catch (err) {
-    console.error(err)
-    alert('确认收货失败，请重试')
-  }
+  const ok = updateOrder(orderId, {
+    status: 'completed',
+    finish_time: new Date().toLocaleString()
+  })
+  if (ok) alert('确认收货成功！')
 }
 
-// 打开评价弹窗
+// ---------------- 评价 ----------------
 const openCommentModal = (orderId) => {
   currentCommentOrderId.value = orderId
   commentContent.value = ''
   showCommentModal.value = true
 }
 
-// 提交评价
-const submitComment = async () => {
+const submitComment = () => {
   if (!commentContent.value.trim()) {
     alert('请输入评价内容！')
     return
   }
-
-  const userInfoStr = localStorage.getItem('userInfo')
-  const userInfo = JSON.parse(userInfoStr)
-
-  try {
-    const res = await axios.post('/order.php', {
-      action: 'add_comment',
-      order_id: currentCommentOrderId.value,
-      comment: commentContent.value
-    })
-
-    if (res.data.code === 200) {
-      alert('评价成功！')
-      showCommentModal.value = false
-      initOrderList()
-    } else {
-      alert('评价失败：' + res.data.msg)
-    }
-  } catch (err) {
-    console.error(err)
-    alert('评价失败，请重试')
+  const ok = updateOrder(currentCommentOrderId.value, {
+    is_commented: 1,
+    comment: commentContent.value,
+    comment_time: new Date().toLocaleString()
+  })
+  if (ok) {
+    alert('评价成功！')
+    showCommentModal.value = false
   }
 }
 
-onMounted(() => initOrderList())
+onMounted(() => {
+  initOrderList()
+})
 </script>
 
 <style scoped>
