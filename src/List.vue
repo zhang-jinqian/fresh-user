@@ -124,7 +124,7 @@ const categories = ref([
 
 // ---------------- 商品静态数据（数据库 products 表） ----------------
 // 图片文件名：good1.jpg ~ good18.jpg，放在 public 根目录
-const rawGoodsList = ref([
+const rawGoodsList = [
   // 新鲜蔬菜
   { id: 3,  categoryId: 1, name: '西红柿',           spec: '沙瓤多汁，酸甜浓郁，可生食或做番茄炒蛋。',   price: 6.00,    img: import.meta.env.BASE_URL + 'good3.jpg',  stock: 46, hot: 1, count: 0, soldOut: false },
   { id: 4,  categoryId: 1, name: '西兰花',           spec: '花球紧实翠绿，营养丰富，适合清炒、蒜蓉或水煮。', price: 8.00,  img: import.meta.env.BASE_URL + 'good2.png',  stock: 26, hot: 1, count: 0, soldOut: false },
@@ -154,7 +154,7 @@ const rawGoodsList = ref([
   { id: 19, categoryId: 6, name: '速冻猪肉白菜水饺', spec: '皮薄馅足，汤汁浓郁，煮制方便，是快捷早餐或晚餐。', price: 20.00, img: import.meta.env.BASE_URL + 'good17.jpg', stock: 48, hot: 0, count: 0, soldOut: false },
   { id: 20, categoryId: 6, name: '深海鳕鱼排',       spec: '外酥里嫩，无刺少骨，适合儿童，空气炸锅即可制作。',   price: 15.00,  img: import.meta.env.BASE_URL + 'good18.png', stock: 30, hot: 1, count: 0, soldOut: false },
   { id: 21, categoryId: 6, name: '灌汤小笼包',       spec: '皮薄透光，汤汁鲜美，肉馅饱满，蒸制即食。',         price: 19.00, img: import.meta.env.BASE_URL + 'good19.jpg', stock: 30, hot: 1, count: 0, soldOut: false }
-])
+]
 const goodsData = ref(rawGoodsList.map(item => ({
   ...item,
   // hot=1：原价 = 现价 × 1.2（保留两位小数）；hot=0：原价 = 现价
