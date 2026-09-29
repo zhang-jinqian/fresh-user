@@ -131,10 +131,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import axios from 'axios'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const orderInfo = ref(null)
 
 const statusMap = {
@@ -143,36 +143,78 @@ const statusMap = {
   shipped: { text: '已发货', class: 'status-shipped' },
   completed: { text: '已完成', class: 'status-completed' },
   cancelled: { text: '已取消', class: 'status-cancelled' },
-  cancel_requested:{text: '取消审核中',class:'status-cancel_requested'}
+  cancel_requested: { text: '取消审核中', class: 'status-cancel_requested' }
 }
 
-const getStatusText = (status) => statusMap[status]?.text || '未知状态'
-const getStatusClass = (status) => statusMap[status]?.class || ''
+const getStatusText = (s) => statusMap[s]?.text || '未知状态'
+const getStatusClass = (s) => statusMap[s]?.class || ''
 
-const getOrderDetail = async () => {
-  const orderId = route.params.id
-  try {
-    const res = await axios.get(`http://localhost/cai/api/order_detail.php?id=${orderId}`)
-    orderInfo.value = res.data.data
-  } catch (err) {
-    console.error('获取订单详情失败', err)
-    alert('获取订单详情失败：' + (err.response?.data?.msg || err.message))
+const NUM_TO_STR = { 0:'pending', 1:'paid', 2:'shipped', 3:'completed', 4:'cancelled', 5:'cancel_requested' }
+
+const loadOrderList = () => {
+  const str = localStorage.getItem('orderList')
+  if (!str) return []
+  try { return JSON.parse(str) || [] } catch (e) { return [] }
+}
+
+const saveOrderList = (list) => {
+  localStorage.setItem('orderList', JSON.stringify(list))
+}
+
+const getOrderDetail = () => {
+  const userInfoStr = localStorage.getItem('userInfo')
+  if (!userInfoStr) {
+    alert('请先登录！')
+    router.push('/login')
+    return
+  }
+  const userInfo = JSON.parse(userInfoStr)
+  const orderId = Number(route.params.id)
+
+  const all = loadOrderList()
+  const order = all.find(o => o.id === orderId && o.user_id === userInfo.id)
+
+  if (!order) {
+    alert('未找到该订单')
+    router.push('/order-list')
+    return
+  }
+
+  // 状态归一化
+  const status = typeof order.status === 'number'
+    ? (NUM_TO_STR[order.status] || 'pending')
+    : order.status
+
+  orderInfo.value = {
+    ...order,
+    status,
+    // 保证这几个字段一定存在，避免模板 .toFixed 报错
+    total_amount: Number(order.total_amount) || 0,
+    discount_amount: Number(order.discount_amount) || 0,
+    pay_amount: Number(order.pay_amount) || 0,
+    coupon_name: order.coupon_info ? '优惠券' : '',
+    // 保证 goods 里 price 是 number
+    goods: (order.goods || []).map(g => ({
+      ...g,
+      price: Number(g.price) || 0,
+      count: Number(g.count) || 0
+    }))
   }
 }
 
-const handleConfirm = async () => {
+const handleConfirm = () => {
   if (!confirm('确定确认收货？')) return
-  try {
-    await axios.put('http://localhost/cai/api/order.php', {
-      id: orderInfo.value.id,
-      action: 'confirm'
-    })
-    alert('确认收货成功')
-    getOrderDetail()
-  } catch (err) {
-    console.error('确认收货失败', err)
-    alert('确认收货失败：' + (err.response?.data?.msg || err.message))
+  const all = loadOrderList()
+  const idx = all.findIndex(o => o.id === orderInfo.value.id)
+  if (idx === -1) {
+    alert('订单不存在')
+    return
   }
+  all[idx].status = 'completed'
+  all[idx].finish_time = new Date().toLocaleString()
+  saveOrderList(all)
+  alert('确认收货成功')
+  getOrderDetail()
 }
 
 onMounted(() => {
