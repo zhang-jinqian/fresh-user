@@ -216,7 +216,7 @@ onMounted(() => {
 
 /* ------- 以下样式保持不变 ------- */
 .detail-left {
-  width: 400px;
+  width: 350px;
   flex-shrink: 0;
 }
 
@@ -291,7 +291,7 @@ onMounted(() => {
 .operate-btn {
   display: flex;
   gap: 20px;
-  margin-left: 90px
+  margin-left: 200px
 }
 
 .add-cart-btn,
