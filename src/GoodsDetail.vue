@@ -189,7 +189,7 @@ onMounted(() => {
 
 /* 内层：1200px 白卡居中 */
 .detail-content {
-  width: 1200px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   background: #fff;
@@ -291,6 +291,7 @@ onMounted(() => {
 .operate-btn {
   display: flex;
   gap: 20px;
+  margin-left: 90px
 }
 
 .add-cart-btn,
