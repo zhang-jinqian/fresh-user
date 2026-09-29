@@ -189,7 +189,7 @@ onMounted(() => {
 
 /* 内层：1200px 白卡居中 */
 .detail-content {
-  width: 100%;
+  width: 1200px;
   max-width: 1200px;
   margin: 0 auto;
   background: #fff;
