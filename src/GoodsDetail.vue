@@ -178,31 +178,46 @@ onMounted(() => {
 })
 </script>
 <style scoped>
+/* 外层：满宽灰底 */
 .goods-detail-page {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 20px;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f7f8fa;
+  padding: 20px 0;
   font-family: "Microsoft Yahei", sans-serif;
 }
 
-.loading, .empty {
+/* 内层：1200px 白卡居中 */
+.detail-content {
+  width: 1200px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 40px;
+}
+
+/* 加载 / 空状态：也放进白卡里 */
+.loading,
+.empty {
+  width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   text-align: center;
   padding: 100px 0;
   font-size: 18px;
   color: #999;
 }
 
-.detail-content {
-  display: flex;
-  gap: 40px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
+/* ------- 以下样式保持不变 ------- */
 .detail-left {
   width: 400px;
+  flex-shrink: 0;
 }
 
 .goods-big-img {
@@ -215,6 +230,7 @@ onMounted(() => {
 
 .detail-right {
   flex: 1;
+  min-width: 0;
 }
 
 .goods-title {
@@ -242,7 +258,9 @@ onMounted(() => {
   margin-left: 15px;
 }
 
-.goods-category, .goods-spec, .goods-status {
+.goods-category,
+.goods-spec,
+.goods-status {
   margin-bottom: 15px;
   font-size: 16px;
 }
@@ -275,7 +293,8 @@ onMounted(() => {
   gap: 20px;
 }
 
-.add-cart-btn, .back-btn {
+.add-cart-btn,
+.back-btn {
   padding: 10px 30px;
   font-size: 16px;
   border: none;
@@ -298,7 +317,8 @@ onMounted(() => {
   color: #333;
 }
 
-.add-cart-btn:hover:not(:disabled), .back-btn:hover {
+.add-cart-btn:hover:not(:disabled),
+.back-btn:hover {
   opacity: 0.9;
 }
 </style>
